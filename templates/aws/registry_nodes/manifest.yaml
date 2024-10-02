@@ -32,6 +32,14 @@ variables:
     type: string
     optional: false
     description: "The security group needed for an ec2 instance"
+  aws_volume_type:
+    type: string
+    default: gp3
+    description: "The type of aws volume for each provisioned instance"
+  aws_volume_size:
+    type: integer
+    default: 80
+    description: "the size of each aws volume/disk for each provisioned instance"
   aws_vpc:
     type: string
     optional: false

@@ -44,8 +44,8 @@ resource "aws_instance" "registry" {
 
   ebs_block_device {
     device_name           = "/dev/sda1"
-    volume_size           = "200"
-    volume_type           = "gp3"
+     volume_size           = var.aws_volume_size
+     volume_type           = var.aws_volume_type
     encrypted             = true
     delete_on_termination = true
   }
@@ -82,6 +82,7 @@ resource "aws_route53_record" "aws_route53" {
   name               = "${aws_instance.registry.tags.Name}"
   type               = "A"
   ttl                = "300"
+  allow_overwrite    = true
   records            = [var.airgap_setup ? aws_instance.registry.private_ip : aws_instance.registry.public_ip]
 }
 

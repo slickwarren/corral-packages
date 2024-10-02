@@ -477,6 +477,7 @@ resource "aws_route53_record" "aws_route53" {
   name               = var.aws_hostname_prefix
   type               = "CNAME"
   ttl                = "300"
+  allow_overwrite    = true
   records            = [aws_lb.aws_nlb.dns_name]
 }
 
@@ -486,6 +487,7 @@ resource "aws_route53_record" "aws_route53_internal" {
   name               = "${var.aws_hostname_prefix}-internal"
   type               = "CNAME"
   ttl                = "300"
+  allow_overwrite    = true
   records            = [aws_lb.aws_internal_nlb[0].dns_name]
 }
 

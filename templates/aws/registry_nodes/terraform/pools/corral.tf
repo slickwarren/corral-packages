@@ -11,6 +11,8 @@ variable "aws_region" {}
 variable "aws_ami" {}
 variable "aws_route53_zone" {}
 variable "aws_ssh_user" {}
+variable "aws_volume_type" {}
+variable "aws_volume_size" {}
 variable "aws_security_group" {}
 variable "aws_vpc" {}
 variable "aws_subnet" {}

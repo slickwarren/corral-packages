@@ -134,6 +134,19 @@ else
 	helm template ./cert-manager-"v${CORRAL_cert_manager_version}".tgz | awk '$1 ~ /image:/ {print $2}' | sed s/\"//g >>./rancher-images.txt
 	sort -u rancher-images.txt -o rancher-images.txt
 
+	if [ "enabled" = "$CORRAL_registry_auth" ]; then
+		corral_log "Login to the Docker registry to load images"
+
+		docker login -u "$USERNAME" -p "$PASSWORD" "$CORRAL_registry_fqdn"
+	else
+		corral_log "No login needed to load images to theregistry"
+	fi
+	corral_log "Saving images to host. Estimated time 1hr"
+	bash rancher-save-images.sh --image-list rancher-images.txt
+
+	corral_log "Loading images to the registry. Estimated time 1hr"
+	bash rancher-load-images.sh --image-list rancher-images.txt --registry "$CORRAL_registry_fqdn"
+	
 	if [ "enabled" = "$CORRAL_windows_registry" ]; then
 		corral_log "Adding Windows images to registry"
 		wget -O rancher-windows-images.txt "${DOWNLOAD_URL}v${CORRAL_rancher_version}"/rancher-windows-images.txt
@@ -181,20 +194,6 @@ else
 		while IFS= read -r img; do set +e; $(pwd)/go/bin/crane copy $img-windows-amd64 $registry/$img-windows-amd64 --insecure --allow-nondistributable-artifacts; done < rancher-images.txt
 		while IFS= read -r img; do set +e; $(pwd)/go/bin/crane copy $img $registry/$img --insecure --allow-nondistributable-artifacts; done < rancher-windows-images.txt
 		set -e;
-	else
-		corral_log "Not adding windows images to this registry"
-		if [ "enabled" = "$CORRAL_registry_auth" ]; then
-			corral_log "Login to the Docker registry to load images"
-
-			docker login -u "$USERNAME" -p "$PASSWORD" "$CORRAL_registry_fqdn"
-		else
-			corral_log "No login needed to load images to theregistry"
-		fi
-		corral_log "Saving images to host. Estimated time 1hr"
-		bash rancher-save-images.sh --image-list rancher-images.txt
-
-		corral_log "Loading images to the registry. Estimated time 1hr"
-		bash rancher-load-images.sh --image-list rancher-images.txt --registry "$CORRAL_registry_fqdn"
 	fi
 
 	if [ -z $CORRAL_suse_registry ]; then
